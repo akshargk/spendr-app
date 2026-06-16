@@ -1,63 +1,192 @@
+import { useEffect, useState } from 'react';
 import {
   ScrollView,
   StyleSheet,
   Text,
   View,
-} from "react-native";
+  TextInput,
+  Pressable,
+  KeyboardAvoidingView,
+  Platform,
+  Alert,
+} from 'react-native';
+
+import BudgetCard from '../components/BudgetCard';
 
 import {
   COLORS,
   FONT,
   RADIUS,
   SPACING,
-} from "../constants/colors";
+} from '../constants/colors';
 
-import BudgetCard from "../components/BudgetCard";
+import {
+  loadProfile,
+  saveProfile,
+} from '../services/storage';
 
 export default function ProfileScreen() {
-  const name = "Hey there";
-  const personality = "The Cautious Spender";
-  const monthlyBudget = 15000;
-  const spent = 6200;
+  const [name, setName] = useState('');
+  const [budget, setBudget] = useState('15000');
+  const [spent] = useState(6200);
+
+  const [editMode, setEditMode] = useState(false);
+
+  const [nameErr, setNameErr] = useState('');
+  const [budgetErr, setBudgetErr] = useState('');
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const profile = await loadProfile();
+
+      setName(profile.name);
+      setBudget(String(profile.budget));
+    };
+
+    fetchProfile();
+  }, []);
+
+  const validate = () => {
+    let valid = true;
+
+    if (!name.trim()) {
+      setNameErr('Please enter your name');
+      valid = false;
+    } else {
+      setNameErr('');
+    }
+
+    if (
+      !budget ||
+      isNaN(Number(budget)) ||
+      Number(budget) <= 0
+    ) {
+      setBudgetErr('Enter a valid budget');
+      valid = false;
+    } else {
+      setBudgetErr('');
+    }
+
+    return valid;
+  };
+
+  const handleSave = async () => {
+    if (!validate()) return;
+
+    await saveProfile(
+      name.trim(),
+      Number(budget)
+    );
+
+    setEditMode(false);
+
+    Alert.alert(
+      'Saved',
+      'Profile updated successfully!'
+    );
+  };
 
   return (
-    <ScrollView
+    <KeyboardAvoidingView
       style={styles.screen}
-      contentContainerStyle={styles.scroll}
+      behavior={
+        Platform.OS === 'ios'
+          ? 'padding'
+          : 'height'
+      }
     >
-      <View style={styles.avatarBlock}>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>
-            {name.charAt(0).toUpperCase()}
-          </Text>
-        </View>
-
-        <Text style={styles.name}>
-          {name}
-        </Text>
-
-        <View style={styles.personalityBadge}>
-          <Text style={styles.personalityText}>
-            {personality}
-          </Text>
-        </View>
-      </View>
-
-      <View
-        style={{
-          marginTop: SPACING.lg,
-        }}
+      <ScrollView
+        contentContainerStyle={styles.scroll}
       >
-        <BudgetCard
-          monthlyBudget={monthlyBudget}
-          spent={spent}
-        />
-      </View>
+        <View style={styles.avatarBlock}>
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>
+              {name
+                ? name.charAt(0).toUpperCase()
+                : '?'}
+            </Text>
+          </View>
 
-      <Text style={styles.versionTag}>
-        Spendr v1.0 Bootcamp build
-      </Text>
-    </ScrollView>
+          {editMode ? (
+            <>
+              <TextInput
+                style={styles.input}
+                value={name}
+                onChangeText={setName}
+                placeholder="Your name"
+              />
+
+              {nameErr ? (
+                <Text style={styles.error}>
+                  {nameErr}
+                </Text>
+              ) : null}
+
+              <TextInput
+                style={styles.input}
+                value={budget}
+                onChangeText={setBudget}
+                keyboardType="numeric"
+                placeholder="Monthly Budget"
+              />
+
+              {budgetErr ? (
+                <Text style={styles.error}>
+                  {budgetErr}
+                </Text>
+              ) : null}
+
+              <Pressable
+                style={styles.button}
+                onPress={handleSave}
+              >
+                <Text style={styles.buttonText}>
+                  Save Profile
+                </Text>
+              </Pressable>
+            </>
+          ) : (
+            <>
+              <Text style={styles.name}>
+                {name || 'Your Name'}
+              </Text>
+
+              <View
+                style={styles.personalityBadge}
+              >
+                <Text
+                  style={styles.personalityText}
+                >
+                  The Cautious Spender
+                </Text>
+              </View>
+
+              <Pressable
+                style={styles.button}
+                onPress={() =>
+                  setEditMode(true)
+                }
+              >
+                <Text style={styles.buttonText}>
+                  Edit Profile
+                </Text>
+              </Pressable>
+            </>
+          )}
+        </View>
+
+        <View
+          style={{
+            marginTop: SPACING.xl,
+          }}
+        >
+          <BudgetCard
+            monthlyBudget={Number(budget)}
+            spent={spent}
+          />
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -73,8 +202,7 @@ const styles = StyleSheet.create({
   },
 
   avatarBlock: {
-    alignItems: "center",
-    paddingTop: SPACING.md,
+    alignItems: 'center',
   },
 
   avatar: {
@@ -82,43 +210,60 @@ const styles = StyleSheet.create({
     height: 84,
     borderRadius: 42,
     backgroundColor: COLORS.primary,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 3,
-    borderColor: COLORS.primarySoft,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   avatarText: {
-    color: COLORS.text,
+    color: COLORS.white,
     fontSize: FONT.xxl,
-    fontWeight: "800",
+    fontWeight: '800',
   },
 
   name: {
     color: COLORS.text,
     fontSize: FONT.xl,
-    fontWeight: "800",
+    fontWeight: '800',
     marginTop: SPACING.md,
   },
 
   personalityBadge: {
+    marginTop: SPACING.md,
     backgroundColor: COLORS.primarySoft,
     paddingHorizontal: SPACING.md,
     paddingVertical: 6,
-    borderRadius: RADIUS.pill,
-    marginTop: SPACING.md,
+    borderRadius: RADIUS.full,
   },
 
   personalityText: {
     color: COLORS.primary,
-    fontSize: FONT.sm,
-    fontWeight: "700",
+    fontWeight: '700',
   },
 
-  versionTag: {
-    color: COLORS.textDim,
-    fontSize: FONT.xs,
-    textAlign: "center",
-    marginTop: SPACING.xl,
+  input: {
+    width: '100%',
+    marginTop: SPACING.md,
+    padding: SPACING.md,
+    borderRadius: RADIUS.md,
+    backgroundColor: COLORS.surface,
+    color: COLORS.text,
+  },
+
+  button: {
+    marginTop: SPACING.lg,
+    backgroundColor: COLORS.primary,
+    padding: SPACING.md,
+    borderRadius: RADIUS.md,
+  },
+
+  buttonText: {
+    color: COLORS.white,
+    fontWeight: '700',
+  },
+
+  error: {
+    color: 'red',
+    marginTop: 4,
+    alignSelf: 'flex-start',
   },
 });
