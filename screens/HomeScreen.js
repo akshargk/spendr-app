@@ -6,10 +6,11 @@ import {
 } from 'react-native';
 
 import ExpenseCard from '../components/ExpenseCard';
-import { FAKE_EXPENSES } from '../constants/expenses';
 
-export default function HomeScreen() {
-  const total = FAKE_EXPENSES.reduce(
+export default function HomeScreen({
+  expenses,
+}) {
+  const total = expenses.reduce(
     (sum, item) => sum + item.amount,
     0
   );
@@ -17,7 +18,7 @@ export default function HomeScreen() {
   return (
     <View style={styles.screen}>
       <FlatList
-        data={FAKE_EXPENSES}
+        data={expenses}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <ExpenseCard expense={item} />
@@ -36,7 +37,7 @@ export default function HomeScreen() {
             </Text>
 
             <Text style={styles.sub}>
-              {FAKE_EXPENSES.length} expenses
+              {expenses.length} expenses
             </Text>
           </View>
         }
