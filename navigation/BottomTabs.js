@@ -87,7 +87,6 @@ export default function BottomTabs({
 
       <Tab.Screen
         name="StatsTab"
-        component={StatsScreen}
         options={{
           tabBarLabel: 'Stats',
 
@@ -99,7 +98,11 @@ export default function BottomTabs({
             />
           ),
         }}
-      />
+      >
+        {() => (
+          <StatsScreen expenses={expenses} />
+        )}
+      </Tab.Screen>
 
       <Tab.Screen
         name="ProfileTab"
