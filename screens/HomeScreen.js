@@ -1,5 +1,7 @@
 import {
   FlatList,
+  Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -8,11 +10,13 @@ import {
 import {
   COLORS,
   FONT,
+  RADIUS,
   SPACING,
 } from "../constants/colors";
 
 import ExpenseCard from "../components/ExpenseCard";
 import MoneyFactBanner from "../components/MoneyFactBanner";
+import { useCategoryFilter } from "../context/CategoryFilterContext";
 
 const formatINR = (n) =>
   "Rs. " +
@@ -20,11 +24,29 @@ const formatINR = (n) =>
     maximumFractionDigits: 0,
   });
 
+const CATEGORIES = [
+  { key: "all", label: "All" },
+  { key: "food", label: "Food" },
+  { key: "travel", label: "Travel" },
+  { key: "entertainment", label: "Entertainment" },
+  { key: "other", label: "Other" },
+];
+
 export default function HomeScreen({
   expenses,
   navigation,
 }) {
-  const total = expenses.reduce(
+  const { selectedCategory, setSelectedCategory } =
+    useCategoryFilter();
+
+  const filtered =
+    selectedCategory === "all"
+      ? expenses
+      : expenses.filter(
+          (e) => e.category === selectedCategory
+        );
+
+  const total = filtered.reduce(
     (sum, e) => sum + e.amount,
     0
   );
@@ -32,7 +54,7 @@ export default function HomeScreen({
   return (
     <View style={styles.screen}>
       <FlatList
-        data={expenses}
+        data={filtered}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <ExpenseCard
@@ -62,9 +84,43 @@ export default function HomeScreen({
               </Text>
 
               <Text style={styles.headerSub}>
-                {expenses.length} expenses logged
+                {filtered.length} expenses logged
               </Text>
             </View>
+
+            {/* Day 9 — Category Filter Chips */}
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.chipScroll}
+              contentContainerStyle={styles.chipRow}
+            >
+              {CATEGORIES.map((cat) => {
+                const isActive =
+                  selectedCategory === cat.key;
+                return (
+                  <Pressable
+                    key={cat.key}
+                    onPress={() =>
+                      setSelectedCategory(cat.key)
+                    }
+                    style={[
+                      styles.chip,
+                      isActive && styles.chipActive,
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.chipText,
+                        isActive && styles.chipTextActive,
+                      ]}
+                    >
+                      {cat.label}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
           </>
         }
         ListEmptyComponent={
@@ -74,7 +130,9 @@ export default function HomeScreen({
             </Text>
 
             <Text style={styles.emptyText}>
-              No expenses yet — tap + to add one
+              {selectedCategory === "all"
+                ? "No expenses yet — tap + to add one"
+                : `No ${selectedCategory} expenses yet`}
             </Text>
           </View>
         }
@@ -82,7 +140,6 @@ export default function HomeScreen({
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
@@ -117,6 +174,38 @@ const styles = StyleSheet.create({
     color: COLORS.textDim,
     fontSize: FONT.sm,
     marginTop: SPACING.xs,
+  },
+
+  chipScroll: {
+    marginBottom: SPACING.md,
+  },
+
+  chipRow: {
+    gap: SPACING.sm,
+  },
+
+  chip: {
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    borderRadius: RADIUS.full,
+    borderWidth: 1.5,
+    borderColor: COLORS.border,
+    backgroundColor: COLORS.surface,
+  },
+
+  chipActive: {
+    backgroundColor: COLORS.primary,
+    borderColor: COLORS.primary,
+  },
+
+  chipText: {
+    color: COLORS.textMuted,
+    fontSize: FONT.sm,
+    fontWeight: "600",
+  },
+
+  chipTextActive: {
+    color: "#FFFFFF",
   },
 
   empty: {
