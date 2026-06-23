@@ -16,7 +16,7 @@ import {
   FONT,
   RADIUS,
   SPACING,
-} from "../constants/colors";
+} from '../constants/colors';
 
 import BudgetCard from "../components/BudgetCard";
 import {
@@ -244,8 +244,7 @@ const styles = StyleSheet.create({
   },
 
   avatarBlock: {
-    alignItems: "center",
-    paddingTop: SPACING.md,
+    alignItems: 'center',
   },
 
   avatar: {
@@ -263,15 +262,15 @@ const styles = StyleSheet.create({
   },
 
   avatarText: {
-    color: COLORS.text,
+    color: COLORS.white,
     fontSize: FONT.xxl,
-    fontWeight: "800",
+    fontWeight: '800',
   },
 
   nameText: {
     color: COLORS.text,
     fontSize: FONT.xl,
-    fontWeight: "800",
+    fontWeight: '800',
     marginTop: SPACING.md,
   },
 
@@ -285,8 +284,28 @@ const styles = StyleSheet.create({
 
   badgeText: {
     color: COLORS.primary,
-    fontSize: FONT.sm,
-    fontWeight: "700",
+    fontWeight: '700',
+  },
+
+  input: {
+    width: '100%',
+    marginTop: SPACING.md,
+    padding: SPACING.md,
+    borderRadius: RADIUS.md,
+    backgroundColor: COLORS.surface,
+    color: COLORS.text,
+  },
+
+  button: {
+    marginTop: SPACING.lg,
+    backgroundColor: COLORS.primary,
+    padding: SPACING.md,
+    borderRadius: RADIUS.md,
+  },
+
+  buttonText: {
+    color: COLORS.white,
+    fontWeight: '700',
   },
 
   editBtn: {
