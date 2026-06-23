@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -6,12 +6,10 @@ import {
   View,
   TextInput,
   Pressable,
+  Alert,
   KeyboardAvoidingView,
   Platform,
-  Alert,
-} from 'react-native';
-
-import BudgetCard from '../components/BudgetCard';
+} from "react-native";
 
 import {
   COLORS,
@@ -20,56 +18,58 @@ import {
   SPACING,
 } from '../constants/colors';
 
+import BudgetCard from "../components/BudgetCard";
 import {
   loadProfile,
   saveProfile,
-} from '../services/storage';
+} from "../services/storage";
 
 export default function ProfileScreen() {
-  const [name, setName] = useState('');
-  const [budget, setBudget] = useState('15000');
-  const [spent] = useState(6200);
-
+  // State
+  const [name, setName] = useState("");
+  const [budget, setBudget] = useState("15000");
+  const [spent, setSpent] = useState(6200);
   const [editMode, setEditMode] = useState(false);
 
-  const [nameErr, setNameErr] = useState('');
-  const [budgetErr, setBudgetErr] = useState('');
+  const [nameErr, setNameErr] = useState("");
+  const [budgetErr, setBudgetErr] = useState("");
 
+  // Load saved profile on mount
   useEffect(() => {
-    const fetchProfile = async () => {
+    const fetch = async () => {
       const profile = await loadProfile();
 
       setName(profile.name);
       setBudget(String(profile.budget));
     };
 
-    fetchProfile();
+    fetch();
   }, []);
 
+  // Validation
   const validate = () => {
     let valid = true;
 
     if (!name.trim()) {
-      setNameErr('Please enter your name');
+      setNameErr("Name is required");
       valid = false;
     } else {
-      setNameErr('');
+      setNameErr("");
     }
 
-    if (
-      !budget ||
-      isNaN(Number(budget)) ||
-      Number(budget) <= 0
-    ) {
-      setBudgetErr('Enter a valid budget');
+    const num = Number(budget);
+
+    if (!budget || isNaN(num) || num <= 0) {
+      setBudgetErr("Enter a positive number");
       valid = false;
     } else {
-      setBudgetErr('');
+      setBudgetErr("");
     }
 
     return valid;
   };
 
+  // Save profile
   const handleSave = async () => {
     if (!validate()) return;
 
@@ -81,110 +81,152 @@ export default function ProfileScreen() {
     setEditMode(false);
 
     Alert.alert(
-      'Saved',
-      'Profile updated successfully!'
+      "Saved",
+      "Profile updated successfully!"
     );
   };
 
-  return (
+  // Personality based on budget
+  const getPersonality = () => {
+    const b = Number(budget);
+
+    if (b >= 20000) return "The Big Spender";
+    if (b >= 10000) return "The Balanced Buyer";
+
+    return "The Cautious Saver";
+  };
+return (
     <KeyboardAvoidingView
-      style={styles.screen}
+      style={{ flex: 1 }}
       behavior={
-        Platform.OS === 'ios'
-          ? 'padding'
-          : 'height'
+        Platform.OS === "ios"
+          ? "padding"
+          : undefined
       }
     >
       <ScrollView
+        style={styles.screen}
         contentContainerStyle={styles.scroll}
       >
+        {/* Avatar Block */}
         <View style={styles.avatarBlock}>
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>
               {name
                 ? name.charAt(0).toUpperCase()
-                : '?'}
+                : "?"}
             </Text>
           </View>
 
-          {editMode ? (
-            <>
-              <TextInput
-                style={styles.input}
-                value={name}
-                onChangeText={setName}
-                placeholder="Your name"
-              />
+          <Text style={styles.nameText}>
+            {name || "Your Name"}
+          </Text>
 
-              {nameErr ? (
-                <Text style={styles.error}>
-                  {nameErr}
-                </Text>
-              ) : null}
-
-              <TextInput
-                style={styles.input}
-                value={budget}
-                onChangeText={setBudget}
-                keyboardType="numeric"
-                placeholder="Monthly Budget"
-              />
-
-              {budgetErr ? (
-                <Text style={styles.error}>
-                  {budgetErr}
-                </Text>
-              ) : null}
-
-              <Pressable
-                style={styles.button}
-                onPress={handleSave}
-              >
-                <Text style={styles.buttonText}>
-                  Save Profile
-                </Text>
-              </Pressable>
-            </>
-          ) : (
-            <>
-              <Text style={styles.name}>
-                {name || 'Your Name'}
-              </Text>
-
-              <View
-                style={styles.personalityBadge}
-              >
-                <Text
-                  style={styles.personalityText}
-                >
-                  The Cautious Spender
-                </Text>
-              </View>
-
-              <Pressable
-                style={styles.button}
-                onPress={() =>
-                  setEditMode(true)
-                }
-              >
-                <Text style={styles.buttonText}>
-                  Edit Profile
-                </Text>
-              </Pressable>
-            </>
-          )}
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>
+              {getPersonality()}
+            </Text>
+          </View>
         </View>
 
-        <View
-          style={{
-            marginTop: SPACING.xl,
-          }}
+        {/* Edit / Save Button */}
+        <Pressable
+          style={({ pressed }) => [
+            styles.editBtn,
+            pressed && { opacity: 0.8 },
+          ]}
+          onPress={() =>
+            editMode
+              ? handleSave()
+              : setEditMode(true)
+          }
         >
-          <BudgetCard
-            monthlyBudget={Number(budget)}
-            spent={spent}
-          />
-        </View>
+          <Text style={styles.editBtnText}>
+            {editMode
+              ? "Save Profile"
+              : "Edit Profile"}
+          </Text>
+        </Pressable>
+
+        {/* Edit Mode */}
+        {editMode && (
+          <View style={styles.form}>
+            <Text style={styles.fieldLabel}>
+              Your Name
+            </Text>
+
+            <TextInput
+              style={[
+                styles.input,
+                nameErr
+                  ? styles.inputError
+                  : null,
+              ]}
+              value={name}
+              onChangeText={setName}
+              placeholder="Enter your name"
+              placeholderTextColor={
+                COLORS.textDim
+              }
+            />
+
+            {nameErr ? (
+              <Text style={styles.errText}>
+                {nameErr}
+              </Text>
+            ) : null}
+
+            <Text
+              style={[
+                styles.fieldLabel,
+                { marginTop: SPACING.md },
+              ]}
+            >
+              Monthly Budget (Rs.)
+            </Text>
+
+            <TextInput
+              style={[
+                styles.input,
+                budgetErr
+                  ? styles.inputError
+                  : null,
+              ]}
+              value={budget}
+              onChangeText={setBudget}
+              placeholder="e.g. 15000"
+              placeholderTextColor={
+                COLORS.textDim
+              }
+              keyboardType="numeric"
+            />
+{budgetErr ? (
+              <Text style={styles.errText}>
+                {budgetErr}
+              </Text>
+            ) : null}
+          </View>
+        )}
+
+        {/* Budget Card */}
+        {!editMode && (
+          <View
+            style={{
+              marginTop: SPACING.lg,
+            }}
+          >
+            <BudgetCard
+              monthlyBudget={
+                Number(budget) || 15000
+              }
+              spent={spent}
+            />
+          </View>
+        )}
+
+        <Text style={styles.versionTag}>
+          Spendr v1.0 Bootcamp build
+        </Text>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -209,9 +251,14 @@ const styles = StyleSheet.create({
     width: 84,
     height: 84,
     borderRadius: 42,
+
     backgroundColor: COLORS.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
+
+    alignItems: "center",
+    justifyContent: "center",
+
+    borderWidth: 3,
+    borderColor: COLORS.primarySoft,
   },
 
   avatarText: {
@@ -220,22 +267,22 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
 
-  name: {
+  nameText: {
     color: COLORS.text,
     fontSize: FONT.xl,
     fontWeight: '800',
     marginTop: SPACING.md,
   },
 
-  personalityBadge: {
-    marginTop: SPACING.md,
+  badge: {
     backgroundColor: COLORS.primarySoft,
     paddingHorizontal: SPACING.md,
     paddingVertical: 6,
-    borderRadius: RADIUS.full,
+    borderRadius: RADIUS.pill,
+    marginTop: SPACING.sm,
   },
 
-  personalityText: {
+  badgeText: {
     color: COLORS.primary,
     fontWeight: '700',
   },
@@ -261,9 +308,58 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 
-  error: {
-    color: 'red',
-    marginTop: 4,
-    alignSelf: 'flex-start',
+  editBtn: {
+    backgroundColor: COLORS.primary,
+    marginTop: SPACING.lg,
+    borderRadius: RADIUS.pill,
+    paddingVertical: SPACING.sm,
+    paddingHorizontal: SPACING.xl,
+    alignSelf: "center",
+  },
+
+  editBtnText: {
+    color: COLORS.text,
+    fontSize: FONT.md,
+    fontWeight: "700",
+  },
+
+  form: {
+    marginTop: SPACING.lg,
+  },
+
+  fieldLabel: {
+    color: COLORS.textMuted,
+    fontSize: FONT.xs,
+    fontWeight: "700",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+    marginBottom: SPACING.xs,
+  },
+
+  input: {
+    backgroundColor: COLORS.surfaceElevated,
+    color: COLORS.text,
+    fontSize: FONT.md,
+    borderRadius: RADIUS.md,
+    padding: SPACING.md,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+
+  inputError: {
+    borderColor: COLORS.danger,
+  },
+
+  errText: {
+    color: COLORS.danger,
+    fontSize: FONT.xs,
+    marginTop: SPACING.xs,
+  },
+
+  versionTag: {
+    color: COLORS.textDim,
+    fontSize: FONT.xs,
+    textAlign: "center",
+    marginTop: SPACING.xl,
   },
 });

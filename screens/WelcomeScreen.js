@@ -1,11 +1,59 @@
+import { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
   View,
   Pressable,
-} from 'react-native';
+  Alert,
+  Animated,
+} from "react-native";
 
-import { COLORS } from '../constants/colors';
+import { COLORS, FONT, SPACING, RADIUS } from "../constants/colors";
+import { loadProfile } from "../services/storage";
+
+export default function WelcomeScreen({ onGetStarted }) {
+  const [name, setName] = useState("");
+
+  // Load saved name once on mount
+  useEffect(() => {
+    const fetch = async () => {
+      const profile = await loadProfile();
+
+      if (profile.name) {
+        setName(profile.name);
+      }
+    };
+
+    fetch();
+  }, []);
+
+  // Show personalised greeting if name is saved
+  const greeting = name ? `Hey ${name}!` : "Hey there!";
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Spendr</Text>
+
+      <Text style={styles.greeting}>{greeting}</Text>
+
+      <Text style={styles.tagline}>
+        Track your spending vibes
+      </Text>
+
+      <Pressable
+        style={({ pressed }) => [
+          styles.button,
+          pressed && styles.buttonPressed,
+        ]}
+        onPress={onGetStarted}
+      >
+        <Text style={styles.buttonText}>
+          Get Started
+        </Text>
+      </Pressable>
+    </View>
+  );
+}
 
 export default function WelcomeScreen({
   onGetStarted,
@@ -44,36 +92,36 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.bg,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 24,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: SPACING.xl,
   },
 
   title: {
-    fontSize: 48,
-    fontWeight: '800',
+    fontSize: FONT.display,
+    fontWeight: "800",
     color: COLORS.primary,
     letterSpacing: -1,
   },
 
   greeting: {
-    fontSize: 22,
+    fontSize: FONT.xl,
     color: COLORS.text,
-    marginTop: 16,
+    marginTop: SPACING.lg,
   },
 
   tagline: {
-    fontSize: 14,
+    fontSize: FONT.sm,
     color: COLORS.textMuted,
-    marginTop: 6,
-    marginBottom: 40,
+    marginTop: SPACING.sm,
+    marginBottom: SPACING.xxl,
   },
 
   button: {
     backgroundColor: COLORS.primary,
-    paddingHorizontal: 32,
-    paddingVertical: 14,
-    borderRadius: 999,
+    paddingHorizontal: SPACING.xxl,
+    paddingVertical: SPACING.md,
+    borderRadius: RADIUS.pill,
   },
 
   buttonPressed: {
@@ -84,7 +132,7 @@ const styles = StyleSheet.create({
 
   buttonText: {
     color: COLORS.text,
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: FONT.md,
+    fontWeight: "600",
   },
 });

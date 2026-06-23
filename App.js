@@ -1,102 +1,50 @@
 import { useState } from 'react';
-import { Pressable, Text } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { NavigationContainer } from '@react-navigation/native';
 
 import WelcomeScreen from './screens/WelcomeScreen';
-import ProfileScreen from './screens/ProfileScreen';
-import HomeScreen from './screens/HomeScreen';
-import AddScreen from './screens/AddScreen';
+import BottomTabs from './navigation/BottomTabs';
 
-import { COLORS } from './constants/colors';
 import { FAKE_EXPENSES } from './constants/expenses';
 
 export default function App() {
-  const [currentScreen, setCurrentScreen] =
-    useState('welcome');
+  const [showWelcome, setShowWelcome] =
+    useState(true);
 
   const [expenses, setExpenses] =
     useState(FAKE_EXPENSES);
 
-  const addExpense = (expense) => {
+  const addExpense = (newExpense) => {
     setExpenses((prev) => [
-      expense,
+      newExpense,
       ...prev,
     ]);
   };
 
-  const NavLink = ({ to, label }) => (
-    <Pressable
-      onPress={() => setCurrentScreen(to)}
-      style={{
-        padding: 16,
-        alignItems: 'center',
-      }}
-    >
-      <Text
-        style={{
-          color: COLORS.primary,
-          fontWeight: '700',
-        }}
-      >
-        {label}
-      </Text>
-    </Pressable>
-  );
+  if (showWelcome) {
+    return (
+      <>
+        <StatusBar style="light" />
+
+        <WelcomeScreen
+          onGetStarted={() =>
+            setShowWelcome(false)
+          }
+        />
+      </>
+    );
+  }
 
   return (
     <>
       <StatusBar style="light" />
 
-      {currentScreen === 'welcome' && (
-        <WelcomeScreen
-          onGetStarted={() =>
-            setCurrentScreen('profile')
-          }
+      <NavigationContainer>
+        <BottomTabs
+          expenses={expenses}
+          addExpense={addExpense}
         />
-      )}
-
-      {currentScreen === 'profile' && (
-        <>
-          <ProfileScreen />
-
-          <NavLink
-            to="home"
-            label="View Expenses →"
-          />
-        </>
-      )}
-
-      {currentScreen === 'home' && (
-        <>
-          <HomeScreen expenses={expenses} />
-
-          <NavLink
-            to="add"
-            label="+ Add Expense"
-          />
-
-          <NavLink
-            to="profile"
-            label="← Back to Profile"
-          />
-        </>
-      )}
-
-      {currentScreen === 'add' && (
-        <>
-          <AddScreen
-            onAdd={(expense) => {
-              addExpense(expense);
-              setCurrentScreen('home');
-            }}
-          />
-
-          <NavLink
-            to="home"
-            label="← Cancel"
-          />
-        </>
-      )}
+      </NavigationContainer>
     </>
   );
 }

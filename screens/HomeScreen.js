@@ -3,15 +3,29 @@ import {
   StyleSheet,
   Text,
   View,
-} from 'react-native';
+} from "react-native";
 
-import ExpenseCard from '../components/ExpenseCard';
+import {
+  COLORS,
+  FONT,
+  SPACING,
+} from "../constants/colors";
+
+import ExpenseCard from "../components/ExpenseCard";
+import MoneyFactBanner from "../components/MoneyFactBanner";
+
+const formatINR = (n) =>
+  "Rs. " +
+  Number(n).toLocaleString("en-IN", {
+    maximumFractionDigits: 0,
+  });
 
 export default function HomeScreen({
   expenses,
+  navigation,
 }) {
   const total = expenses.reduce(
-    (sum, item) => sum + item.amount,
+    (sum, e) => sum + e.amount,
     0
   );
 
@@ -21,23 +35,46 @@ export default function HomeScreen({
         data={expenses}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <ExpenseCard expense={item} />
+          <ExpenseCard
+            expense={item}
+            onPress={() =>
+              navigation.navigate("Detail", {
+                expense: item,
+              })
+            }
+          />
         )}
-        contentContainerStyle={{
-          padding: 20,
-        }}
+        contentContainerStyle={styles.listContent}
+        showsVerticalScrollIndicator={false}
         ListHeaderComponent={
-          <View style={styles.header}>
-            <Text style={styles.label}>
-              THIS WEEK
+          <>
+            {/* Day 8 Banner */}
+            <MoneyFactBanner />
+
+            {/* Existing Header */}
+            <View style={styles.header}>
+              <Text style={styles.headerLabel}>
+                THIS WEEK
+              </Text>
+
+              <Text style={styles.headerTotal}>
+                {formatINR(total)}
+              </Text>
+
+              <Text style={styles.headerSub}>
+                {expenses.length} expenses logged
+              </Text>
+            </View>
+          </>
+        }
+        ListEmptyComponent={
+          <View style={styles.empty}>
+            <Text style={styles.emptyEmoji}>
+              📭
             </Text>
 
-            <Text style={styles.total}>
-              Rs. {total}
-            </Text>
-
-            <Text style={styles.sub}>
-              {expenses.length} expenses
+            <Text style={styles.emptyText}>
+              No expenses yet — tap + to add one
             </Text>
           </View>
         }
@@ -49,28 +86,51 @@ export default function HomeScreen({
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#0F172A',
+    backgroundColor: COLORS.bg,
+  },
+
+  listContent: {
+    padding: SPACING.lg,
+    paddingBottom: SPACING.xxl,
   },
 
   header: {
-    marginBottom: 20,
+    paddingVertical: SPACING.lg,
+    marginBottom: SPACING.md,
   },
 
-  label: {
-    color: '#94A3B8',
-    fontSize: 12,
-    fontWeight: '700',
+  headerLabel: {
+    color: COLORS.textMuted,
+    fontSize: FONT.xs,
+    fontWeight: "700",
+    letterSpacing: 1,
   },
 
-  total: {
-    color: '#fff',
-    fontSize: 42,
-    fontWeight: '800',
-    marginTop: 6,
+  headerTotal: {
+    color: COLORS.text,
+    fontSize: FONT.display,
+    fontWeight: "800",
+    marginTop: SPACING.xs,
   },
 
-  sub: {
-    color: '#94A3B8',
-    marginTop: 4,
+  headerSub: {
+    color: COLORS.textDim,
+    fontSize: FONT.sm,
+    marginTop: SPACING.xs,
+  },
+
+  empty: {
+    alignItems: "center",
+    paddingTop: SPACING.xxl * 2,
+  },
+
+  emptyEmoji: {
+    fontSize: 48,
+    marginBottom: SPACING.md,
+  },
+
+  emptyText: {
+    color: COLORS.textMuted,
+    fontSize: FONT.md,
   },
 });

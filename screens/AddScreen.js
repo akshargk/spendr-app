@@ -26,7 +26,10 @@ const CATEGORIES = [
   { key: "other", label: "📦 Other" },
 ];
 
-export default function AddScreen({ onAdd }) {
+export default function AddScreen({
+  onAdd,
+  navigation,
+}) {
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("food");
   const [vibe, setVibe] = useState(null);
@@ -91,6 +94,10 @@ export default function AddScreen({ onAdd }) {
     onAdd(newExpense);
 
     resetForm();
+
+    if (navigation) {
+      navigation.goBack();
+    }
   };
 
   return (
@@ -103,9 +110,7 @@ export default function AddScreen({ onAdd }) {
       }
     >
       <ScrollView
-        contentContainerStyle={
-          styles.scroll
-        }
+        contentContainerStyle={styles.scroll}
         keyboardShouldPersistTaps="handled"
       >
         <Text style={styles.title}>
@@ -131,7 +136,7 @@ export default function AddScreen({ onAdd }) {
               setAmountError("");
             }
           }}
-          keyboardType="decimal-pad"
+          keyboardType="numeric"
           placeholder="0"
           placeholderTextColor={
             COLORS.textDim
@@ -139,8 +144,7 @@ export default function AddScreen({ onAdd }) {
           returnKeyType="done"
           maxLength={7}
         />
-
-        {amountError ? (
+{amountError ? (
           <Text style={styles.errorText}>
             {amountError}
           </Text>
@@ -240,7 +244,6 @@ export default function AddScreen({ onAdd }) {
     </KeyboardAvoidingView>
   );
 }
-
 const styles = StyleSheet.create({
   screen: {
     flex: 1,

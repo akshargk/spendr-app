@@ -1,18 +1,5 @@
-import { useState } from 'react';
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
-
-import {
-  COLORS,
-  FONT,
-  RADIUS,
-  SPACING,
-} from '../constants/colors';
-
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { COLORS, FONT, RADIUS, SPACING } from '../constants/colors';
 import { getVibe } from '../constants/vibes';
 
 const formatINR = (n) =>
@@ -23,17 +10,13 @@ const formatINR = (n) =>
 
 const timeAgo = (timestamp) => {
   const hours = Math.floor(
-    (Date.now() - timestamp) /
-      (1000 * 60 * 60)
+    (Date.now() - timestamp) / (1000 * 60 * 60)
   );
 
   if (hours < 1) return 'Just now';
-
-  if (hours < 24)
-    return `${hours}h ago`;
+  if (hours < 24) return `${hours}h ago`;
 
   const days = Math.floor(hours / 24);
-
   return days === 1
     ? 'Yesterday'
     : `${days} days ago`;
@@ -41,25 +24,17 @@ const timeAgo = (timestamp) => {
 
 export default function ExpenseCard({
   expense,
+  onPress,
 }) {
-  const [expanded, setExpanded] =
-    useState(false);
-
   const vibe = getVibe(expense.vibe);
 
   return (
     <Pressable
-      onPress={() =>
-        setExpanded(!expanded)
-      }
+      onPress={onPress}
       style={({ pressed }) => [
         styles.card,
-        {
-          borderLeftColor:
-            vibe.color,
-        },
-        pressed &&
-          styles.cardPressed,
+        { borderLeftColor: vibe.color },
+        pressed && styles.cardPressed,
       ]}
     >
       <View style={styles.topRow}>
@@ -70,9 +45,7 @@ export default function ExpenseCard({
         <View style={styles.middle}>
           <Text
             style={styles.note}
-            numberOfLines={
-              expanded ? 0 : 1
-            }
+            numberOfLines={1}
           >
             {expense.note}
           </Text>
@@ -84,74 +57,26 @@ export default function ExpenseCard({
         </View>
 
         <Text style={styles.amount}>
-          {formatINR(
-            expense.amount
-          )}
+          {formatINR(expense.amount)}
         </Text>
       </View>
-
-      {expanded && (
-        <View style={styles.details}>
-          <View
-            style={[
-              styles.vibeBadge,
-              {
-                backgroundColor:
-                  vibe.color + '22',
-              },
-            ]}
-          >
-            <Text
-              style={[
-                styles.vibeBadgeText,
-                {
-                  color:
-                    vibe.color,
-                },
-              ]}
-            >
-              {vibe.emoji}{' '}
-              {vibe.label} —{' '}
-              {
-                vibe.description
-              }
-            </Text>
-          </View>
-
-          <Text
-            style={styles.detailHint}
-          >
-            Tap again to collapse
-          </Text>
-        </View>
-      )}
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor:
-      COLORS.surface,
-
-    borderRadius:
-      RADIUS.lg,
-
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.lg,
     padding: SPACING.lg,
-
-    marginBottom:
-      SPACING.md,
-
+    marginBottom: SPACING.md,
     borderLeftWidth: 4,
   },
 
   cardPressed: {
     backgroundColor:
       COLORS.surfaceElevated,
-
-    transform: [
-      { scale: 0.99 },
-    ],
+    transform: [{ scale: 0.99 }],
   },
 
   topRow: {
@@ -175,57 +100,15 @@ const styles = StyleSheet.create({
   },
 
   meta: {
-    color:
-      COLORS.textMuted,
-
+    color: COLORS.textMuted,
     fontSize: FONT.xs,
-
     marginTop: 2,
-
-    textTransform:
-      'capitalize',
+    textTransform: 'capitalize',
   },
 
   amount: {
     color: COLORS.text,
     fontSize: FONT.lg,
     fontWeight: '800',
-  },
-
-  details: {
-    marginTop: SPACING.md,
-    paddingTop: SPACING.md,
-    borderTopWidth: 1,
-    borderTopColor:
-      COLORS.border,
-  },
-
-  vibeBadge: {
-    borderRadius:
-      RADIUS.md,
-
-    paddingHorizontal:
-      SPACING.md,
-
-    paddingVertical:
-      SPACING.sm,
-
-    alignSelf:
-      'flex-start',
-  },
-
-  vibeBadgeText: {
-    fontSize: FONT.sm,
-    fontWeight: '700',
-  },
-
-  detailHint: {
-    color:
-      COLORS.textDim,
-
-    fontSize: FONT.xs,
-
-    marginTop:
-      SPACING.sm,
   },
 });

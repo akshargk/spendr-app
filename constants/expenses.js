@@ -1,3 +1,6 @@
+// 8 realistic fake expenses to develop against.
+// Replaced by real user data on Day 5; persisted on Day 10.
+
 export const FAKE_EXPENSES = [
   {
     id: '1',
@@ -5,7 +8,7 @@ export const FAKE_EXPENSES = [
     category: 'food',
     vibe: 'impulse',
     note: 'Midnight Maggi + chips run',
-    date: Date.now() - 1000 * 60 * 60 * 2,
+    date: Date.now() - 1000 * 60 * 60 * 2, // 2 hours ago
   },
 
   {
@@ -14,7 +17,7 @@ export const FAKE_EXPENSES = [
     category: 'entertainment',
     vibe: 'worth-it',
     note: 'Movie night with the gang',
-    date: Date.now() - 1000 * 60 * 60 * 26,
+    date: Date.now() - 1000 * 60 * 60 * 26, // yesterday
   },
 
   {
@@ -32,7 +35,7 @@ export const FAKE_EXPENSES = [
     category: 'other',
     vibe: 'regret',
     note: 'Mechanical keyboard I never use',
-    date: Date.now() - 1000 * 60 * 60 * 24 * 3,
+    date: Date.now() - 1000 * 60 * 60 * 24 * 3, // 3 days ago
   },
 
   {

@@ -3,26 +3,33 @@ import {
   StyleSheet,
   Text,
   View,
-} from 'react-native';
+} from "react-native";
+
+import { VIBES } from "../constants/vibes";
 
 import {
-  COLORS,
-  FONT,
   RADIUS,
   SPACING,
-} from '../constants/colors';
+  FONT,
+} from "../constants/colors";
 
-import { VIBES } from '../constants/vibes';
+// VibePicker is a CONTROLLED component:
+//
+// selected → string | null
+// currently selected vibe key
+//
+// onSelect → function
+// called with vibe key when tapped
 
 export default function VibePicker({
   selected,
   onSelect,
 }) {
   return (
-    <View style={styles.container}>
+    <View style={styles.grid}>
       {Object.entries(VIBES).map(
         ([key, vibe]) => {
-          const isSelected =
+          const isActive =
             selected === key;
 
           return (
@@ -31,37 +38,49 @@ export default function VibePicker({
               onPress={() =>
                 onSelect(key)
               }
-              style={[
-                styles.card,
+              style={({ pressed }) => [
+                styles.vibeBtn,
 
-                isSelected && {
+                isActive && {
+                  backgroundColor:
+                    vibe.color + "22",
                   borderColor:
                     vibe.color,
-
-                  backgroundColor:
-                    vibe.color +
-                    '15',
                 },
+
+                pressed &&
+                  styles.vibeBtnPressed,
               ]}
             >
               <Text
-                style={styles.emoji}
+                style={styles.vibeEmoji}
               >
                 {vibe.emoji}
               </Text>
 
               <Text
                 style={[
-                  styles.label,
+                  styles.vibeLabel,
 
-                  isSelected && {
-                    color:
-                      vibe.color,
+                  isActive && {
+                    color: vibe.color,
                   },
                 ]}
               >
                 {vibe.label}
               </Text>
+
+              {isActive && (
+                <View
+                  style={[
+                    styles.activeDot,
+                    {
+                      backgroundColor:
+                        vibe.color,
+                    },
+                  ]}
+                />
+              )}
             </Pressable>
           );
         }
@@ -71,31 +90,64 @@ export default function VibePicker({
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: SPACING.sm,
+  grid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
   },
 
-  card: {
-    width: '48%',
-    padding: SPACING.md,
-    borderRadius: RADIUS.md,
+  vibeBtn: {
+    flex: 1,
+    minWidth: "44%",
+
+    alignItems: "center",
+
+    paddingVertical: 16,
+
+    borderRadius: RADIUS.lg,
+
     borderWidth: 1.5,
-    borderColor: COLORS.border,
-    backgroundColor:
-      COLORS.surface,
-    alignItems: 'center',
+
+    borderColor: "#334155",
+
+    backgroundColor: "#1E293B",
+
+    position: "relative",
   },
 
-  emoji: {
+  vibeBtnPressed: {
+    opacity: 0.75,
+
+    transform: [
+      {
+        scale: 0.97,
+      },
+    ],
+  },
+
+  vibeEmoji: {
     fontSize: 28,
+
     marginBottom: 6,
   },
 
-  label: {
-    color: COLORS.text,
+  vibeLabel: {
+    color: "#94A3B8",
+
     fontSize: FONT.sm,
-    fontWeight: '700',
+
+    fontWeight: "700",
+  },
+
+  activeDot: {
+    position: "absolute",
+
+    top: 8,
+    right: 8,
+
+    width: 8,
+    height: 8,
+
+    borderRadius: 4,
   },
 });
