@@ -3,19 +3,20 @@ import {
   StyleSheet,
   Text,
   View,
-} from 'react-native';
+} from "react-native";
 
 import {
   COLORS,
   FONT,
   SPACING,
-} from '../constants/colors';
+} from "../constants/colors";
 
-import ExpenseCard from '../components/ExpenseCard';
+import ExpenseCard from "../components/ExpenseCard";
+import MoneyFactBanner from "../components/MoneyFactBanner";
 
 const formatINR = (n) =>
-  'Rs. ' +
-  Number(n).toLocaleString('en-IN', {
+  "Rs. " +
+  Number(n).toLocaleString("en-IN", {
     maximumFractionDigits: 0,
   });
 
@@ -37,7 +38,7 @@ export default function HomeScreen({
           <ExpenseCard
             expense={item}
             onPress={() =>
-              navigation.navigate('Detail', {
+              navigation.navigate("Detail", {
                 expense: item,
               })
             }
@@ -46,19 +47,25 @@ export default function HomeScreen({
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={
-          <View style={styles.header}>
-            <Text style={styles.headerLabel}>
-              THIS WEEK
-            </Text>
+          <>
+            {/* Day 8 Banner */}
+            <MoneyFactBanner />
 
-            <Text style={styles.headerTotal}>
-              {formatINR(total)}
-            </Text>
+            {/* Existing Header */}
+            <View style={styles.header}>
+              <Text style={styles.headerLabel}>
+                THIS WEEK
+              </Text>
 
-            <Text style={styles.headerSub}>
-              {expenses.length} expenses logged
-            </Text>
-          </View>
+              <Text style={styles.headerTotal}>
+                {formatINR(total)}
+              </Text>
+
+              <Text style={styles.headerSub}>
+                {expenses.length} expenses logged
+              </Text>
+            </View>
+          </>
         }
         ListEmptyComponent={
           <View style={styles.empty}>
@@ -95,14 +102,14 @@ const styles = StyleSheet.create({
   headerLabel: {
     color: COLORS.textMuted,
     fontSize: FONT.xs,
-    fontWeight: '700',
+    fontWeight: "700",
     letterSpacing: 1,
   },
 
   headerTotal: {
     color: COLORS.text,
     fontSize: FONT.display,
-    fontWeight: '800',
+    fontWeight: "800",
     marginTop: SPACING.xs,
   },
 
@@ -113,7 +120,7 @@ const styles = StyleSheet.create({
   },
 
   empty: {
-    alignItems: 'center',
+    alignItems: "center",
     paddingTop: SPACING.xxl * 2,
   },
 
