@@ -7,20 +7,20 @@ import { COLORS } from '../constants/colors';
 
 const Stack = createNativeStackNavigator();
 
-export default function HomeStack({ expenses }) {
+export default function HomeStack({
+  expenses,
+  deleteExpense,
+}) {
   return (
     <Stack.Navigator
       screenOptions={{
         headerStyle: {
           backgroundColor: COLORS.bg,
         },
-
         headerTintColor: COLORS.text,
-
         headerTitleStyle: {
           fontWeight: '700',
         },
-
         contentStyle: {
           backgroundColor: COLORS.bg,
         },
@@ -42,11 +42,17 @@ export default function HomeStack({ expenses }) {
 
       <Stack.Screen
         name="Detail"
-        component={ExpenseDetailScreen}
         options={{
           headerTitle: 'Expense Detail',
         }}
-      />
+      >
+        {(props) => (
+          <ExpenseDetailScreen
+            {...props}
+            deleteExpense={deleteExpense}
+          />
+        )}
+      </Stack.Screen>
     </Stack.Navigator>
   );
 }

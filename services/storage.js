@@ -3,6 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const KEYS = {
   NAME: "spendr_user_name",
   BUDGET: "spendr_monthly_budget",
+  EXPENSES: "spendr_expenses",
 };
 
 // SAVE
@@ -41,5 +42,28 @@ export const clearProfile = async () => {
     await AsyncStorage.multiRemove([KEYS.NAME, KEYS.BUDGET]);
   } catch (e) {
     console.error("clearProfile error:", e);
+  }
+};
+
+// SAVE EXPENSES
+export const saveExpenses = async (expenses) => {
+  try {
+    await AsyncStorage.setItem(
+      KEYS.EXPENSES,
+      JSON.stringify(expenses)
+    );
+  } catch (e) {
+    console.error("saveExpenses error:", e);
+  }
+};
+
+// LOAD EXPENSES
+export const loadExpenses = async () => {
+  try {
+    const raw = await AsyncStorage.getItem(KEYS.EXPENSES);
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    console.error("loadExpenses error:", e);
+    return [];
   }
 };
