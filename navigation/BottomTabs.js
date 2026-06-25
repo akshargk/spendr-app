@@ -13,6 +13,7 @@ const Tab = createBottomTabNavigator();
 export default function BottomTabs({
   expenses,
   addExpense,
+  deleteExpense,
 }) {
   return (
     <Tab.Navigator
@@ -51,7 +52,10 @@ export default function BottomTabs({
         }}
       >
         {() => (
-          <HomeStack expenses={expenses} />
+          <HomeStack
+            expenses={expenses}
+            deleteExpense={deleteExpense}
+          />
         )}
       </Tab.Screen>
 
@@ -59,7 +63,6 @@ export default function BottomTabs({
         name="AddTab"
         options={{
           tabBarLabel: 'Add',
-
           tabBarIcon: ({ color, size }) => (
             <Ionicons
               name="add-circle-outline"
@@ -67,14 +70,11 @@ export default function BottomTabs({
               color={color}
             />
           ),
-
           headerShown: true,
           headerTitle: 'Add Expense',
-
           headerStyle: {
             backgroundColor: COLORS.bg,
           },
-
           headerTintColor: COLORS.text,
         }}
       >
@@ -89,7 +89,6 @@ export default function BottomTabs({
         name="StatsTab"
         options={{
           tabBarLabel: 'Stats',
-
           tabBarIcon: ({ color, size }) => (
             <Ionicons
               name="bar-chart-outline"
@@ -109,7 +108,6 @@ export default function BottomTabs({
         component={ProfileScreen}
         options={{
           tabBarLabel: 'Profile',
-
           tabBarIcon: ({ color, size }) => (
             <Ionicons
               name="person-outline"
