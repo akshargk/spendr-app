@@ -55,6 +55,39 @@ export default function WelcomeScreen({ onGetStarted }) {
   );
 }
 
+export default function WelcomeScreen({
+  onGetStarted,
+}) {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>
+        Spendr
+      </Text>
+
+      <Text style={styles.greeting}>
+        Hey there!
+      </Text>
+
+      <Text style={styles.tagline}>
+        Track your spending vibes
+      </Text>
+
+      <Pressable
+        style={({ pressed }) => [
+          styles.button,
+          pressed &&
+            styles.buttonPressed,
+        ]}
+        onPress={onGetStarted}
+      >
+        <Text style={styles.buttonText}>
+          Get Started
+        </Text>
+      </Pressable>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -92,7 +125,8 @@ const styles = StyleSheet.create({
   },
 
   buttonPressed: {
-    backgroundColor: COLORS.primaryPressed,
+    backgroundColor:
+      COLORS.primaryPressed,
     transform: [{ scale: 0.98 }],
   },
 
