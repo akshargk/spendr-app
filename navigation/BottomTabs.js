@@ -105,7 +105,6 @@ export default function BottomTabs({
 
       <Tab.Screen
         name="ProfileTab"
-        component={ProfileScreen}
         options={{
           tabBarLabel: 'Profile',
           tabBarIcon: ({ color, size }) => (
@@ -116,7 +115,11 @@ export default function BottomTabs({
             />
           ),
         }}
-      />
+      >
+        {() => (
+          <ProfileScreen expenses={expenses} />
+        )}
+      </Tab.Screen>
     </Tab.Navigator>
   );
 }
